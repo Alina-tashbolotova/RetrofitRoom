@@ -19,8 +19,8 @@ public class RickAndMortyResponse<T> {
         this.info = info;
     }
 
-    public ArrayList<Character> getResults() {
-        return (ArrayList<Character>) results;
+    public ArrayList<T> getResults() {
+        return (ArrayList<T>) results;
     }
 
     public void setResults(ArrayList<T> results) {

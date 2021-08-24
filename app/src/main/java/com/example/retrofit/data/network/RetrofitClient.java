@@ -1,5 +1,9 @@
 package com.example.retrofit.data.network;
 
+import com.example.retrofit.data.network.apiservices.CharacterApiService;
+import com.example.retrofit.data.network.apiservices.EpisodeApiService;
+import com.example.retrofit.data.network.apiservices.LocationApiService;
+
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -31,4 +35,11 @@ public class RetrofitClient {
     public CharacterApiService provideCharacterApService(){
         return provideRetrofit.create(CharacterApiService.class);
     }
+    public EpisodeApiService provideEpisodeApiService(){
+        return provideRetrofit.create(EpisodeApiService.class);
+    }
+    public LocationApiService provideLocationApiService(){
+        return provideRetrofit.create(LocationApiService.class);
+    }
+
 }

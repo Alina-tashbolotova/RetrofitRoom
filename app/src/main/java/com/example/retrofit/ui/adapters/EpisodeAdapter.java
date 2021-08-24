@@ -7,28 +7,25 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.example.retrofit.data.network.apiservices.CharacterApiService;
-import com.example.retrofit.databinding.ItemCharacterBinding;
-import com.example.retrofit.model.CharacterModel;
+import com.example.retrofit.databinding.ItemEpisodeBinding;
 
+import com.example.retrofit.model.EpisodeModel;
 
 import java.util.ArrayList;
 
-public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.ViewHolder> {
+public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHolder> {
 
-    private ItemCharacterBinding binding;
-
-    private ArrayList<CharacterModel> list = new ArrayList<>();
-
-    private OnItemClickListener listener;
+    OnItemClickListener onItemClickListener;
+    private ItemEpisodeBinding binding;
+    private ArrayList<EpisodeModel> list = new ArrayList<>();
 
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        binding = ItemCharacterBinding.inflate(LayoutInflater.from(parent.getContext()));
+        binding = ItemEpisodeBinding.inflate(LayoutInflater.from(parent.getContext()));
         return new ViewHolder(binding.getRoot());
+
     }
 
     @Override
@@ -42,36 +39,36 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
         return list.size();
     }
 
-    public void addList(ArrayList<CharacterModel> models){
+    public void addList(ArrayList<EpisodeModel> models){
         this.list = models;
         notifyDataSetChanged();
 
     }
 
-
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        public ViewHolder(@NonNull View itemView) {
+        public ViewHolder(@NonNull  View itemView) {
             super(itemView);
-
-        }
-
-        private void onBind(CharacterModel item) {
-
-            Glide.with(binding.imageItemCharacter).load(item.getImage()).into(binding.imageItemCharacter);
-            binding.txtItemCharacterName.setText(item.getName());
             binding.getRoot().setOnClickListener(v -> {
-                listener.onItemClick(item.getId());
+                onItemClickListener.onItemClick(getAdapterPosition());
 
             });
         }
+        private void onBind(EpisodeModel item) {
+            binding.txtItemName.setText(item.getName());
+            binding.txtItemEpisode.setText(item.getEpisode());
+            binding.txtItemAirDate.setText(item.getAir_date());
+            binding.txtItemCreated.setText(item.getCreated());
+        }
+
+
     }
+
     public interface OnItemClickListener {
         void onItemClick(int position);
     }
-
     public void setOnItemClickListener(OnItemClickListener listener){
-        this.listener = listener;
+        this.onItemClickListener = listener;
 
     }
 }

@@ -6,19 +6,21 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.example.retrofit.R;
 import com.example.retrofit.databinding.FragmentCharacterBinding;
 import com.example.retrofit.ui.adapters.CharacterAdapter;
 
 
 public class CharacterFragment extends Fragment {
+
     private CharacterViewModel characterViewModel;
     private FragmentCharacterBinding binding;
     private CharacterAdapter characterAdapter = new CharacterAdapter();
@@ -37,15 +39,31 @@ public class CharacterFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         initialize();
         setUpRequests();
+        setItem();
+
+
+    }
+
+    private void setItem() {
+        characterAdapter.setOnItemClickListener(new CharacterAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
+                        .navigate(CharacterFragmentDirections
+                                .actionCharacterFragmentToCharacterDetailFragment()
+                        .setPhoto(position));
+            }
+        });
 
 
     }
 
     private void setUpRequests() {
-        characterViewModel.fetchCharacter().observe(getViewLifecycleOwner(), characters -> {
-            characterAdapter.addList(characters.getResults());
+     characterViewModel.fetchCharacter().observe(getViewLifecycleOwner(), characterModelRickAndMortyResponse -> {
+         characterAdapter.addList(characterModelRickAndMortyResponse.getResults());
 
-        });
+
+     });
 
     }
 
