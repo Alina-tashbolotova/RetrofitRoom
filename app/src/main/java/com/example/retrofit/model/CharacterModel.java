@@ -1,8 +1,15 @@
 package com.example.retrofit.model;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+
 import com.google.gson.annotations.SerializedName;
 
+@Entity
 public class CharacterModel {
+
+    @PrimaryKey(autoGenerate = true)
     @SerializedName("id")
     private int id;
 
@@ -10,7 +17,7 @@ public class CharacterModel {
     private String name;
 
     @SerializedName("image")
-     private String image;
+    private String image;
 
     @SerializedName("status")
     private String status;

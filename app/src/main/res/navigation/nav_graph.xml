@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/characterFragment">
+    app:startDestination="@id/navigation_characters">
 
     <fragment
-        android:id="@+id/characterFragment"
+        android:id="@+id/navigation_characters"
         android:name="com.example.retrofit.ui.fragment.character.CharacterFragment"
         android:label="fragment_character"
         tools:layout="@layout/fragment_character" >
@@ -24,4 +24,15 @@
             android:name="photo"
             app:argType="integer" />
     </fragment>
+
+    <fragment
+        android:id="@+id/navigation_episodes"
+        android:name="com.example.retrofit.ui.fragment.episode.EpisodeFragment"
+        android:label="fragment_episode"
+        tools:layout="@layout/fragment_episode" />
+    <fragment
+        android:id="@+id/navigation_locations"
+        android:name="com.example.retrofit.ui.fragment.location.LocationFragment"
+        android:label="fragment_location"
+        tools:layout="@layout/fragment_location" />
 </navigation>

@@ -1,30 +1,27 @@
 package com.example.retrofit.ui.adapters;
 
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.retrofit.databinding.ItemEpisodeBinding;
-
 import com.example.retrofit.model.EpisodeModel;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHolder> {
 
     OnItemClickListener onItemClickListener;
-    private ItemEpisodeBinding binding;
-    private ArrayList<EpisodeModel> list = new ArrayList<>();
+    private List<EpisodeModel> list = new ArrayList<>();
 
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        binding = ItemEpisodeBinding.inflate(LayoutInflater.from(parent.getContext()));
-        return new ViewHolder(binding.getRoot());
+        return new ViewHolder(ItemEpisodeBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
 
     }
 
@@ -39,21 +36,33 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
         return list.size();
     }
 
-    public void addList(ArrayList<EpisodeModel> models){
-        this.list = models;
+    public void addList(List<EpisodeModel> list) {
+        this.list = list;
         notifyDataSetChanged();
 
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.onItemClickListener = listener;
 
-        public ViewHolder(@NonNull  View itemView) {
-            super(itemView);
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(int position);
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        private ItemEpisodeBinding binding;
+
+        public ViewHolder(ItemEpisodeBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
             binding.getRoot().setOnClickListener(v -> {
                 onItemClickListener.onItemClick(getAdapterPosition());
 
             });
         }
+
         private void onBind(EpisodeModel item) {
             binding.txtItemName.setText(item.getName());
             binding.txtItemEpisode.setText(item.getEpisode());
@@ -61,14 +70,6 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
             binding.txtItemCreated.setText(item.getCreated());
         }
 
-
-    }
-
-    public interface OnItemClickListener {
-        void onItemClick(int position);
-    }
-    public void setOnItemClickListener(OnItemClickListener listener){
-        this.onItemClickListener = listener;
 
     }
 }

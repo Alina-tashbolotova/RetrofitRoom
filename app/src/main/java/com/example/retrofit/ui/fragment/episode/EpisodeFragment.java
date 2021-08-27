@@ -1,6 +1,13 @@
 package com.example.retrofit.ui.fragment.episode;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -9,10 +16,6 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
 import com.example.retrofit.databinding.FragmentEpisodeBinding;
 import com.example.retrofit.model.EpisodeModel;
 import com.example.retrofit.model.RickAndMortyResponse;
@@ -34,10 +37,17 @@ public class EpisodeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initialize();
-        setUpRequests();
+        checkInternetEpisode();
     }
 
-    private void setUpRequests() {
+
+    private void initialize() {
+        episodeViewModel = new ViewModelProvider(requireActivity()).get(EpisodeViewModel.class);
+        setEpisodeRecycler();
+
+    }
+
+    private void setUpRequestsEpisode() {
         episodeViewModel.fetchEpisode().observe(getViewLifecycleOwner(), new Observer<RickAndMortyResponse<EpisodeModel>>() {
             @Override
             public void onChanged(RickAndMortyResponse<EpisodeModel> episodeModelRickAndMortyResponse) {
@@ -47,11 +57,6 @@ public class EpisodeFragment extends Fragment {
         });
     }
 
-    private void initialize() {
-        episodeViewModel = new ViewModelProvider(requireActivity()).get(EpisodeViewModel.class);
-        setEpisodeRecycler();
-
-    }
 
     private void setEpisodeRecycler() {
         binding.recyclerEpisode.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -61,5 +66,22 @@ public class EpisodeFragment extends Fragment {
             Toast.makeText(requireContext(), "Click position" + position, Toast.LENGTH_SHORT).show();
 
         });
+    }
+
+    private void setUpOffRequestEpisodes() {
+        episodeAdapter.addList(episodeViewModel.getEpisode());
+    }
+
+    private void checkInternetEpisode() {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
+            setUpRequestsEpisode();
+
+        } else {
+            setUpOffRequestEpisodes();
+
+        }
     }
 }

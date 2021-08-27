@@ -1,6 +1,13 @@
 package com.example.retrofit.ui.fragment.location;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -8,13 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
-
 import com.example.retrofit.databinding.FragmentLocationBinding;
-
 import com.example.retrofit.ui.adapters.LocationAdapter;
 
 
@@ -34,18 +35,20 @@ public class LocationFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initialize();
-        setUpRequests();
+        checkInternetLocation();
     }
 
-    private void setUpRequests() {
-        locationViewModel.fetchLocation().observe(getViewLifecycleOwner(), locationModelRickAndMortyResponse ->
-                locationAdapter.addList(locationModelRickAndMortyResponse.getResults()));
-    }
 
     private void initialize() {
         locationViewModel = new ViewModelProvider(requireActivity()).get(LocationViewModel.class);
         setUpLocationRecycler();
     }
+
+    private void setUpRequestsLocation() {
+        locationViewModel.fetchLocation().observe(getViewLifecycleOwner(), locationModelRickAndMortyResponse ->
+                locationAdapter.addList(locationModelRickAndMortyResponse.getResults()));
+    }
+
 
     private void setUpLocationRecycler() {
         binding.recyclerLocation.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -56,4 +59,23 @@ public class LocationFragment extends Fragment {
 
         });
     }
+
+    public void setUpOffRequestsLocations() {
+        locationAdapter.addList(locationViewModel.getLocation());
+    }
+
+    private void checkInternetLocation() {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
+            setUpRequestsLocation();
+
+        } else {
+            setUpOffRequestsLocations();
+
+        }
+    }
+
+
 }

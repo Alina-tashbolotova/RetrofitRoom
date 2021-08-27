@@ -3,31 +3,23 @@ package com.example.retrofit.ui.fragment.episode;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.retrofit.App;
+import com.example.retrofit.data.repositories.EpisodeRepository;
 import com.example.retrofit.model.EpisodeModel;
 import com.example.retrofit.model.RickAndMortyResponse;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import java.util.List;
 
 public class EpisodeViewModel extends ViewModel {
 
-    MutableLiveData<RickAndMortyResponse<EpisodeModel>> fetchEpisode() {
-        MutableLiveData<RickAndMortyResponse<EpisodeModel>> data = new MutableLiveData<>();
-        App.episodeApiService.fetchEpisode().enqueue(new Callback<RickAndMortyResponse<EpisodeModel>>() {
-            @Override
-            public void onResponse(Call<RickAndMortyResponse<EpisodeModel>> call, Response<RickAndMortyResponse<EpisodeModel>> response) {
-                data.setValue(response.body());
-            }
+    private final EpisodeRepository episodeRepository = new EpisodeRepository();
 
-            @Override
-            public void onFailure(Call<RickAndMortyResponse<EpisodeModel>> call, Throwable t) {
-                data.setValue(null);
+    public MutableLiveData<RickAndMortyResponse<EpisodeModel>> fetchEpisode() {
+        return episodeRepository.fetchEpisode();
 
-            }
-        });
-
-        return data;
     }
+
+    public List<EpisodeModel> getEpisode() {
+        return episodeRepository.getEpisode();
+    }
+
 }
