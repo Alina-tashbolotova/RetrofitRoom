@@ -14,10 +14,12 @@ import retrofit2.Response;
 
 public class CharacterRepository {
 
-    public MutableLiveData<RickAndMortyResponse<CharacterModel>> fetchCharacter() {
+    public MutableLiveData<RickAndMortyResponse<CharacterModel>> fetchCharacter(
+            int page
+    ) {
         MutableLiveData<RickAndMortyResponse<CharacterModel>> data = new MutableLiveData<>();
 
-        App.characterApiService.fetchCharacters().enqueue(new Callback<RickAndMortyResponse<CharacterModel>>() {
+        App.characterApiService.fetchCharacters(page).enqueue(new Callback<RickAndMortyResponse<CharacterModel>>() {
             @Override
             public void onResponse(Call<RickAndMortyResponse<CharacterModel>> call, Response<RickAndMortyResponse<CharacterModel>> response) {
                 App.characterDao.insertAll(response.body().getResults());

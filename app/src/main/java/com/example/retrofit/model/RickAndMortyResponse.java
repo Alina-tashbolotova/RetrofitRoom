@@ -3,6 +3,7 @@ package com.example.retrofit.model;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class RickAndMortyResponse<T> {
     @SerializedName("info")

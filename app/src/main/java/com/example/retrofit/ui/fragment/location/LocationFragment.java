@@ -10,19 +10,27 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.retrofit.base.BaseFragment;
 import com.example.retrofit.databinding.FragmentLocationBinding;
 import com.example.retrofit.ui.adapters.LocationAdapter;
 
+import org.jetbrains.annotations.NotNull;
 
-public class LocationFragment extends Fragment {
+
+public class LocationFragment extends BaseFragment<LocationViewModel, FragmentLocationBinding> {
+
+
     private LocationViewModel locationViewModel;
     private FragmentLocationBinding binding;
     private LocationAdapter locationAdapter = new LocationAdapter();
+    private LinearLayoutManager linearLayoutManager;
+    private int visibleItemCount;
+    private int totalItemCount;
+    private int postVisiblesItems;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -31,51 +39,75 @@ public class LocationFragment extends Fragment {
         return binding.getRoot();
     }
 
+
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        initialize();
-        checkInternetLocation();
-    }
-
-
-    private void initialize() {
+    protected void initialize() {
+        super.initialize();
         locationViewModel = new ViewModelProvider(requireActivity()).get(LocationViewModel.class);
-        setUpLocationRecycler();
+        setupRecycler();
     }
 
-    private void setUpRequestsLocation() {
+    @Override
+    protected void setupRequests() {
+        super.setupRequests();
         locationViewModel.fetchLocation().observe(getViewLifecycleOwner(), locationModelRickAndMortyResponse ->
                 locationAdapter.addList(locationModelRickAndMortyResponse.getResults()));
     }
 
 
-    private void setUpLocationRecycler() {
-        binding.recyclerLocation.setLayoutManager(new LinearLayoutManager(getContext()));
+    @Override
+    protected void setupRecycler() {
+        super.setupRecycler();
+        linearLayoutManager = new LinearLayoutManager(getContext());
+        binding.recyclerLocation.setLayoutManager(linearLayoutManager);
         binding.recyclerLocation.setAdapter(locationAdapter);
 
         locationAdapter.setOnItemClickListener(position -> {
             Toast.makeText(requireContext(), "Click position" + position, Toast.LENGTH_SHORT).show();
 
         });
+
+        binding.recyclerLocation.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (dy > 0) {
+                    visibleItemCount = linearLayoutManager.getItemCount();
+                    totalItemCount = linearLayoutManager.getItemCount();
+                    postVisiblesItems = linearLayoutManager.findFirstVisibleItemPosition();
+                    if ((visibleItemCount + postVisiblesItems) >= totalItemCount) {
+                        locationViewModel.page++;
+                        locationViewModel.fetchLocation().observe(getViewLifecycleOwner(), locationModelRickAndMortyResponse -> {
+                            locationAdapter.addList(locationModelRickAndMortyResponse.getResults());
+                        });
+
+
+                    }
+
+                }
+            }
+        });
     }
 
-    public void setUpOffRequestsLocations() {
+    @Override
+    protected void setupOffRequests() {
+        super.setupOffRequests();
         locationAdapter.addList(locationViewModel.getLocation());
     }
 
-    private void checkInternetLocation() {
+
+    @Override
+    protected void checkInternet() {
+        super.checkInternet();
         ConnectivityManager connectivityManager =
                 (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
                 connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
-            setUpRequestsLocation();
+            setupRequests();
 
         } else {
-            setUpOffRequestsLocations();
+            setupOffRequests();
 
         }
     }
-
-
 }

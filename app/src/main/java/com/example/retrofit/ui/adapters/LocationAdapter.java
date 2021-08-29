@@ -34,7 +34,7 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
     }
 
     public void addList(List<LocationModel> list) {
-        this.list = list;
+        this.list.addAll(list);
         notifyDataSetChanged();
 
     }

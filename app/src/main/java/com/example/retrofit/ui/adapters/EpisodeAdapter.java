@@ -37,7 +37,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
     }
 
     public void addList(List<EpisodeModel> list) {
-        this.list = list;
+        this.list.addAll(list);
         notifyDataSetChanged();
 
     }

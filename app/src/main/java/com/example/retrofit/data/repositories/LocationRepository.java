@@ -13,18 +13,25 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class LocationRepository {
-    public MutableLiveData<RickAndMortyResponse<LocationModel>> fetchLocation() {
+
+    public MutableLiveData<RickAndMortyResponse<LocationModel>> fetchLocation(
+            int page
+    ) {
+
         MutableLiveData<RickAndMortyResponse<LocationModel>> data = new MutableLiveData<>();
-        App.locationApiService.fetchLocation().enqueue(new Callback<RickAndMortyResponse<LocationModel>>() {
+        App.locationApiService.fetchLocation(page).enqueue(new Callback<RickAndMortyResponse<LocationModel>>() {
             @Override
             public void onResponse(Call<RickAndMortyResponse<LocationModel>> call, Response<RickAndMortyResponse<LocationModel>> response) {
-                App.locationDao.InsertAll(response.body().getResults());
-                data.setValue(response.body());
+                if (response.body() != null){
+                    App.locationDao.InsertAll(response.body().getResults());
+                    data.setValue(response.body());
+                }
+
             }
 
             @Override
             public void onFailure(Call<RickAndMortyResponse<LocationModel>> call, Throwable t) {
-                data.setValue(null);
+                data.postValue(null);
 
             }
         });
