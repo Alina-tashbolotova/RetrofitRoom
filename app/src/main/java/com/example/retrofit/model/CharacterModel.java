@@ -3,8 +3,9 @@ package com.example.retrofit.model;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-
 import com.google.gson.annotations.SerializedName;
+
+import java.util.Objects;
 
 @Entity
 public class CharacterModel {
@@ -63,5 +64,18 @@ public class CharacterModel {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CharacterModel characterModel = (CharacterModel) o;
+        return id == characterModel.id && Objects.equals(name, characterModel.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name);
     }
 }

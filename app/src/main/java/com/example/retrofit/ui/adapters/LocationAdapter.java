@@ -4,61 +4,53 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.retrofit.databinding.ItemLocationBinding;
+import com.example.retrofit.diff.LocationDiffUtil;
+import com.example.retrofit.iterfaces.OnItemClickListener;
 import com.example.retrofit.model.LocationModel;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
-public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder> {
-    OnItemClickListener onItemClickListener;
-    private List<LocationModel> list = new ArrayList<>();
+public class LocationAdapter extends ListAdapter<LocationModel, LocationAdapter.ViewHolder> {
+
+    private OnItemClickListener listener;
+
+    public LocationAdapter() {
+        super(new LocationDiffUtil());
+    }
 
     @NonNull
+    @NotNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(ItemLocationBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.onBind(list.get(position));
-
+    public LocationAdapter.ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
+        return new LocationAdapter.ViewHolder(
+                ItemLocationBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
     }
 
     @Override
-    public int getItemCount() {
-        return list.size();
-    }
-
-    public void addList(List<LocationModel> list) {
-        this.list.addAll(list);
-        notifyDataSetChanged();
+    public void onBindViewHolder(@NonNull @NotNull LocationAdapter.ViewHolder holder, int position) {
+        holder.onBind(getItem(position));
 
     }
 
-    public void setOnItemClickListener(LocationAdapter.OnItemClickListener listener) {
-        this.onItemClickListener = listener;
-
-    }
-
-    public interface OnItemClickListener {
-        void onItemClick(int position);
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         private ItemLocationBinding binding;
 
-        public ViewHolder(ItemLocationBinding binding) {
+        public ViewHolder(@NonNull ItemLocationBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
+
             binding.getRoot().setOnClickListener(v -> {
-                onItemClickListener.onItemClick(getAdapterPosition());
+                listener.onItemClickListener(getAdapterPosition());
 
             });
-
         }
 
         private void onBind(LocationModel item) {

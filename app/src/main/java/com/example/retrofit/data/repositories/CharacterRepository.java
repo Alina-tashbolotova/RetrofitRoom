@@ -22,8 +22,11 @@ public class CharacterRepository {
         App.characterApiService.fetchCharacters(page).enqueue(new Callback<RickAndMortyResponse<CharacterModel>>() {
             @Override
             public void onResponse(Call<RickAndMortyResponse<CharacterModel>> call, Response<RickAndMortyResponse<CharacterModel>> response) {
-                App.characterDao.insertAll(response.body().getResults());
-                data.setValue(response.body());
+                if (response.body() != null) {
+                    App.characterDao.insertAll(response.body().getResults());
+                    data.setValue(response.body());
+                }
+
             }
 
             @Override

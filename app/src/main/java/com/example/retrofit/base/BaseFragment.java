@@ -1,14 +1,14 @@
 package com.example.retrofit.base;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.View;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.viewbinding.ViewBinding;
-
-import org.jetbrains.annotations.NotNull;
 
 public abstract class BaseFragment<ViewModel extends BaseViewModel, Binding extends ViewBinding> extends Fragment {
 
@@ -17,10 +17,11 @@ public abstract class BaseFragment<ViewModel extends BaseViewModel, Binding exte
 
 
     @Override
-    public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         initialize();
+        setupRequests();
         setupObservers();
         checkInternet();
 
@@ -32,17 +33,21 @@ public abstract class BaseFragment<ViewModel extends BaseViewModel, Binding exte
     protected void setupRequests() {
     }
 
-    protected void setupOffRequests() {
-    }
-
     protected void setupObservers() {
-    }
-
-    protected void checkInternet() {
     }
 
     protected void setupRecycler() {
 
+    }
+
+    protected boolean checkInternet() {
+
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        return connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE)
+                .getState() == NetworkInfo.State.CONNECTED || connectivityManager
+                .getNetworkInfo(ConnectivityManager.TYPE_WIFI)
+                .getState() == NetworkInfo.State.CONNECTED;
     }
 
 

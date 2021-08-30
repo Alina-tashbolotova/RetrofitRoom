@@ -1,8 +1,5 @@
 package com.example.retrofit.ui.fragment.character;
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,8 +19,6 @@ import com.example.retrofit.ui.adapters.CharacterAdapter;
 
 public class CharacterFragment extends BaseFragment<CharacterViewModel, FragmentCharacterBinding> {
 
-    private CharacterViewModel characterViewModel;
-    private FragmentCharacterBinding binding;
     private CharacterAdapter characterAdapter = new CharacterAdapter();
     private LinearLayoutManager linearLayoutManager;
     private int visibleItemCount;
@@ -33,15 +28,15 @@ public class CharacterFragment extends BaseFragment<CharacterViewModel, Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        binding = FragmentCharacterBinding.inflate(inflater, container, false);
-        return binding.getRoot();
+        viewBinding = FragmentCharacterBinding.inflate(inflater, container, false);
+        return viewBinding.getRoot();
 
     }
 
     @Override
     protected void initialize() {
         super.initialize();
-        characterViewModel = new ViewModelProvider(requireActivity()).get(CharacterViewModel.class);
+        viewModel = new ViewModelProvider(requireActivity()).get(CharacterViewModel.class);
         setupRecycler();
     }
 
@@ -49,36 +44,29 @@ public class CharacterFragment extends BaseFragment<CharacterViewModel, Fragment
     protected void setupRecycler() {
         super.setupRecycler();
         linearLayoutManager = new LinearLayoutManager(getContext());
-        binding.recyclerCharacter.setLayoutManager(linearLayoutManager);
-        binding.recyclerCharacter.setAdapter(characterAdapter);
+        viewBinding.recyclerCharacter.setLayoutManager(linearLayoutManager);
+        viewBinding.recyclerCharacter.setAdapter(characterAdapter);
 
         characterAdapter.setOnItemClickListener(position -> {
-            ConnectivityManager connectivityManager =
-                    (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-            if (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
-                    connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
-
+            if (checkInternet()) {
                 Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
                         .navigate(CharacterFragmentDirections
                                 .actionCharacterFragmentToCharacterDetailFragment()
                                 .setPhoto(position));
                 Toast.makeText(CharacterFragment.this.requireContext(), "Click position" + position, Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(CharacterFragment.this.requireContext(), "Нет интернета" + position, Toast.LENGTH_SHORT).show();
-
+                Toast.makeText(CharacterFragment.this.getContext(), "Нет интернета!!!", Toast.LENGTH_SHORT).show();
             }
-
         });
     }
 
     @Override
     protected void setupRequests() {
-        super.setupRequests();
-        characterViewModel.fetchCharacter().observe(getViewLifecycleOwner(), characterModelRickAndMortyResponse -> {
-            characterAdapter.addList(characterModelRickAndMortyResponse.getResults());
+        if (!fetchInternetCharacter()) {
+            characterAdapter.submitList(viewModel.getCharacters());
+        }
 
-        });
-        binding.recyclerCharacter.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        viewBinding.recyclerCharacter.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
@@ -87,45 +75,22 @@ public class CharacterFragment extends BaseFragment<CharacterViewModel, Fragment
                     totalItemCount = linearLayoutManager.getItemCount();
                     postVisiblesItems = linearLayoutManager.findFirstVisibleItemPosition();
                     if ((visibleItemCount + postVisiblesItems) >= totalItemCount) {
-                        characterViewModel.page++;
-                        characterViewModel.fetchCharacter().observe(getViewLifecycleOwner(), characterModelRickAndMortyResponse -> {
-                            characterAdapter.addList(characterModelRickAndMortyResponse.getResults());
-                        });
-
+                        viewModel.page++;
+                        fetchInternetCharacter();
                     }
-
                 }
             }
         });
-
-
     }
 
-
-    @Override
-    protected void setupOffRequests() {
-        super.setupOffRequests();
-        characterAdapter.addList(characterViewModel.getCharacters());
-
-    }
-
-
-    @Override
-    protected void checkInternet() {
-        super.checkInternet();
-        ConnectivityManager connectivityManager =
-                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
-                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
-            setupRequests();
-
+    private boolean fetchInternetCharacter() {
+        if (checkInternet()) {
+            viewModel.fetchCharacter().observe(getViewLifecycleOwner(), characterModelRickAndMortyResponse -> {
+                characterAdapter.submitList(characterModelRickAndMortyResponse.getResults());
+            });
+            return true;
         } else {
-            setupOffRequests();
-
+            return false;
         }
-
-
     }
-
-
 }

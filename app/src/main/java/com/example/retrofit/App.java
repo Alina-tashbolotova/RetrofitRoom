@@ -25,17 +25,16 @@ public class App extends Application {
         super.onCreate();
 
         RetrofitClient retrofitClient = new RetrofitClient();
+
         characterApiService = retrofitClient.provideCharacterApService();
         episodeApiService = retrofitClient.provideEpisodeApiService();
         locationApiService = retrofitClient.provideLocationApiService();
 
         RoomClient roomClient = new RoomClient();
+
         characterDao = roomClient.provideCharacterDao(roomClient.provideDatabase(this));
         episodeDao = roomClient.provideEpisodeDao(roomClient.provideDatabase(this));
         locationDao = roomClient.provideLocationDao(roomClient.provideDatabase(this));
-
-
-
 
 
     }

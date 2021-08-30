@@ -4,6 +4,9 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
+
+import java.util.Objects;
+
 @Entity
 public class EpisodeModel {
 
@@ -61,5 +64,18 @@ public class EpisodeModel {
 
     public void setCreated(String created) {
         this.created = created;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EpisodeModel episodeModel = (EpisodeModel) o;
+        return id == episodeModel.id && Objects.equals(name, episodeModel.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name);
     }
 }

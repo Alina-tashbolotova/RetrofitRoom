@@ -4,61 +4,50 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.retrofit.databinding.ItemEpisodeBinding;
+import com.example.retrofit.diff.EpisodeDiffUtil;
+import com.example.retrofit.iterfaces.OnItemClickListener;
 import com.example.retrofit.model.EpisodeModel;
 
-import java.util.ArrayList;
-import java.util.List;
+public class EpisodeAdapter extends ListAdapter<EpisodeModel, EpisodeAdapter.ViewHolder> {
 
-public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHolder> {
+    private OnItemClickListener listener;
+    private EpisodeDiffUtil episodeDiffUtil;
 
-    OnItemClickListener onItemClickListener;
-    private List<EpisodeModel> list = new ArrayList<>();
-
+    public EpisodeAdapter() {
+        super(new EpisodeDiffUtil());
+    }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(ItemEpisodeBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+    public EpisodeAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return new EpisodeAdapter.ViewHolder(
+                ItemEpisodeBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
 
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.onBind(list.get(position));
-
-    }
-
-    @Override
-    public int getItemCount() {
-        return list.size();
-    }
-
-    public void addList(List<EpisodeModel> list) {
-        this.list.addAll(list);
-        notifyDataSetChanged();
+    public void onBindViewHolder(@NonNull EpisodeAdapter.ViewHolder holder, int position) {
+        holder.onBind(getItem(position));
 
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
-        this.onItemClickListener = listener;
-
+        this.listener = listener;
     }
 
-    public interface OnItemClickListener {
-        void onItemClick(int position);
-    }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         private ItemEpisodeBinding binding;
 
-        public ViewHolder(ItemEpisodeBinding binding) {
+        public ViewHolder(@NonNull ItemEpisodeBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
             binding.getRoot().setOnClickListener(v -> {
-                onItemClickListener.onItemClick(getAdapterPosition());
+                listener.onItemClickListener(getAdapterPosition());
 
             });
         }
@@ -69,7 +58,5 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
             binding.txtItemAirDate.setText(item.getAir_date());
             binding.txtItemCreated.setText(item.getCreated());
         }
-
-
     }
 }
